@@ -21,7 +21,7 @@ function canStartNewGame() {
     const currentTime = Date.now();
     const timeElapsed = currentTime - lastGameTime;
     const oneHour = 60 * 60 * 1000;
-   
+
     if (timeElapsed < oneHour && gamesPlayed >= 5) {
         messageElement.textContent = "You can only play 5 games in an hour. Please try again later.";
         return false;
@@ -83,6 +83,7 @@ function handleCellClick(cell, number) {
     } else {
         cell.classList.add('wrong');
         messageElement.textContent = `Oops! Wrong number. Try again!`;
+        disableGrid(); 
     }
 }
 
@@ -96,7 +97,7 @@ function startTimer() {
             } else {
                 clearInterval(timerInterval);
                 messageElement.textContent = "Game Over! Try again!";
-                gameOver = true; // Disable the grid after time runs out
+                gameOver = true; 
                 disableGrid();
                 showNewGameButton();
             }
@@ -107,7 +108,14 @@ function startTimer() {
 function disableGrid() {
     const cells = gridElement.querySelectorAll('.cell');
     cells.forEach(cell => {
-        cell.removeEventListener('click', handleCellClick); // Disable further clicks
+        cell.removeEventListener('click', handleCellClick); 
+    });
+}
+
+function enableGrid() {
+    const cells = gridElement.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.addEventListener('click', () => handleCellClick(cell, parseInt(cell.textContent)));
     });
 }
 
@@ -128,12 +136,13 @@ function startNewGame() {
 }
 
 function resetGame() {
-    gameOver = false;
+    clearInterval(timerInterval);
     currentNumber = 1;
     timer = 60;
     timerElement.textContent = timer;
     messageElement.textContent = `Start with 1!`;
     document.getElementById("newGameButton").style.display = "none";
+    gameOver = false;
     generateGrid();
 }
 
