@@ -1,15 +1,19 @@
-let currentNumber = 1; // Start at 1
-let gridSize = 4; // 4x4 grid
-let totalNumbers = gridSize * gridSize; // Total cells (16 for a 4x4 grid)
+let currentNumber = 1; 
+let gridSize = 6; 
+let totalNumbers = gridSize * gridSize; 
 let numbers = []; 
 let gridElement = document.getElementById("grid");
 let messageElement = document.getElementById("message");
-let gamesCompleted = 0; 
+let timerElement = document.getElementById("timerValue");
+let timer = 60; 
+let timerInterval;
+let timerRunning = false;
+let gameOver = false;
 
 function generateGrid() {
-    gridElement.innerHTML = '';
-    
+    gridElement.innerHTML = ''; 
     numbers = [];
+
     for (let i = 1; i <= totalNumbers; i++) {
         numbers.push(i);
     }
@@ -23,36 +27,29 @@ function generateGrid() {
         cell.addEventListener('click', () => handleCellClick(cell, numbers[i]));
         gridElement.appendChild(cell);
     }
+
+    startTimer();
 }
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
 }
 
 function handleCellClick(cell, number) {
+    if (gameOver) return; 
+
     if (number === currentNumber) {
         cell.classList.add('visited');
         cell.classList.add('correct');
         currentNumber++;
 
         if (currentNumber > totalNumbers) {
-            gamesCompleted++;
-            if (gamesCompleted < 5) {
-                messageElement.textContent = `Congratulations! You've completed game ${gamesCompleted}! New Challenge Coming Up!`;
-                setTimeout(() => {
-                    currentNumber = 1;
-                    resetGame(); 
-                }, 2000);
-            } else {
-                messageElement.textContent = "That’s enough for today, go touch grass. Bye!";
-                setTimeout(() => {
-                    gridElement.innerHTML = ''; // 
-                }, 2000); // 
-            }
+            clearInterval(timerInterval);
+            messageElement.textContent = "Congratulations! You've completed the game!";
         } else {
             messageElement.textContent = `Correct! Now, find ${currentNumber}`;
         }
@@ -62,7 +59,37 @@ function handleCellClick(cell, number) {
     }
 }
 
+function startTimer() {
+    if (!timerRunning) {
+        timerRunning = true;
+        timerInterval = setInterval(function () {
+            if (timer > 0) {
+                timer--;
+                timerElement.textContent = timer;
+            } else {
+                clearInterval(timerInterval);
+                messageElement.textContent = "Game Over! Try again!";
+                gameOver = true; 
+                disableGrid();
+            }
+        }, 1000);
+    }
+}
+
+function disableGrid() {
+    const cells = gridElement.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.removeEventListener('click', handleCellClick); 
+    });
+}
+
 function resetGame() {
+    clearInterval(timerInterval);
+    currentNumber = 1;
+    timer = 60;
+    timerElement.textContent = timer;
+    messageElement.textContent = `Start with 1!`;
+    gameOver = false;
     generateGrid();
 }
 
