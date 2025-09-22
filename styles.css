@@ -76,3 +76,12 @@ button:hover {
     color: #f44336;
     margin-top: 20px;
 }
+
+#newGameButton {
+    margin-top: 20px;
+    background-color: #4CAF50;
+}
+
+#newGameButton:hover {
+    background-color: #45a049;
+}
